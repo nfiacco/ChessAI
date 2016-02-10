@@ -1,0 +1,20 @@
+Chess AI
+Nicholas Fiacco
+
+This is a collection of various chess engines, each an improvement upon the
+last.  Within the src directory, you will find several chess engines, names:
+
+RandomAI
+MinimaxAI
+AlphaBetaAI
+TransAI
+MTDFAI
+KillerAI
+
+This lists them in order of performance, from worst to best.  Furthermore, note
+that you can test them by setting the initial position in chessgame.java and
+choosing the AI in chessclient.java, where one player should be the human
+for maximum control (in positions where there is a guarenteed win for the
+computer, resistance is futile).
+
+In order to access the writeup, please refer to the doc directory.
