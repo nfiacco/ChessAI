@@ -2,7 +2,7 @@ Chess AI
 Nicholas Fiacco
 
 This is a collection of various chess engines, each an improvement upon the
-last.  Within the src directory, you will find several chess engines, names:
+last.  Within the src directory, you will find several chess engines, named:
 
 RandomAI
 MinimaxAI
