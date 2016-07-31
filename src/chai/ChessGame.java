@@ -15,12 +15,12 @@ public class ChessGame {
 	public ChessGame() {
 		//position = new Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // normal setup
 		
-		position = new Position("8/8/8/8/8/k1B5/BN6/K7 w - - 0 1"); // white wins in 6
-		
-		//position = new Position("5r2/p1p1p1k1/1p2prpp/4R3/3P2P1/P1P1Q3/2q1R2P/6K1 b - - 1 28"); // black wins in 5
+		//position = new Position("8/8/8/8/8/k1B5/BN6/K7 w - - 0 1"); // white wins in 6
 		
 		//position = new Position("r5k1/p3Qpbp/2p3p1/1p6/q3bN2/6PP/PP3P2/K2RR3 b - - 0 1"); // black wins in 3
-
+		
+		position = new Position("r2qk2r/pp6/2pbp3/2Pp1p2/3PBPp1/4PRp1/PP1BQ1P1/4R1K1 b kq - 0 20"); // black wins in 4
+		
 	}
 
 	public int getStone(int col, int row) {

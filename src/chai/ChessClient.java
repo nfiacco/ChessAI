@@ -74,8 +74,8 @@ public class ChessClient extends Application {
 		// from a server, depending on which type is used.
 		moveMaker = new MoveMaker[2];
 
-		moveMaker[Chess.WHITE] = new AIMoveMaker(new KillerAI(12, logArea));
-		moveMaker[Chess.BLACK] = new TextFieldMoveMaker();
+		moveMaker[Chess.BLACK] = new AIMoveMaker(new KillerAI(8, logArea));
+		moveMaker[Chess.WHITE] = new TextFieldMoveMaker();
 
 		// moveMaker[Chess.WHITE] = new AIMoveMaker(new TransAI(20));
 		// moveMaker[Chess.BLACK] = new TextFieldMoveMaker();
