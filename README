@@ -18,3 +18,11 @@ for maximum control (in positions where there is a guarenteed win for the
 computer, resistance is futile).
 
 In order to access the writeup, please refer to the doc directory.
+
+Execution Instructions:
+1) clone the repository
+2) navigate to the /exec directory
+3) run the command: "java -jar <jar file name here>"
+4) chess view should open, with keyboard input
+
+Note: performance is most notable in endgame situations, rather than the normal setup
