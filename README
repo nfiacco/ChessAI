@@ -26,3 +26,4 @@ Execution Instructions:
 4) chess view should open, with keyboard input
 
 Note: performance is most notable in endgame situations, rather than the normal setup
+Also note: all executable JARS utilize the fully optimized version of the engine.
