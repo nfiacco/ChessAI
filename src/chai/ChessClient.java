@@ -23,14 +23,12 @@ import chesspresso.position.Position;
 public class ChessClient extends Application {
 
 	private static final int PIXELS_PER_SQUARE = 64;
-	private static final String welcomeMessage = 
-			"Welcome to CS 76 chess.  Moves can be made using algebraic notation;"
+	private static final String welcomeMessage = "Welcome to the ChessBot Engine.  Moves can be made using algebraic notation;"
 			+ " for example the command c2c3 would move the piece at c2 to c3.  \n";
-		
-	
+
 	TextField commandField;
 	TextArea logArea;
-	
+
 	BoardView boardView;
 	ChessGame game;
 	// RandomMoveSource[] playerMoveSources;
@@ -44,43 +42,44 @@ public class ChessClient extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
-		primaryStage.setTitle("CS 76 Chess");
+		primaryStage.setTitle("ChessBot Engine");
 
 		game = new ChessGame();
 
-		// build the board
-		boardView = new BoardView(game, PIXELS_PER_SQUARE);
-
 		// build the text area for giving log info to user
 		logArea = new TextArea();
-	 	//logArea.setPrefColumnCount(50);
-	 	logArea.setPrefRowCount(5);
-	 	logArea.setEditable(false);
-	 	logArea.setWrapText(true);
-	 	log(welcomeMessage);
+		// logArea.setPrefColumnCount(50);
+		logArea.setPrefRowCount(8);
+		logArea.setEditable(false);
+		logArea.setWrapText(true);
+		logArea.setFocusTraversable(false);
+		log(welcomeMessage);
 		
+		// build the board
+		boardView = new BoardView(logArea, game, PIXELS_PER_SQUARE);
+
 		// build the command entry text field
 		commandField = new TextField();
-		
+
 		// request focus on the command field after the ui is built,
 		// to get a blinking cursor
 		Platform.runLater(new Runnable() {
-		    public void run() {
-		        commandField.requestFocus();
-		    }
+			public void run() {
+				commandField.requestFocus();
+			}
 		});
 
 		// set up the movemakers for black and white players.
 		// Movemakers handle getting input from an AI, from the keyboard, or
 		// from a server, depending on which type is used.
 		moveMaker = new MoveMaker[2];
-		
-		moveMaker[Chess.BLACK] = new AIMoveMaker(new KillerAI(12));
-		moveMaker[Chess.WHITE] = new TextFieldMoveMaker();
 
-//		moveMaker[Chess.WHITE] = new AIMoveMaker(new TransAI(20));
-//		moveMaker[Chess.BLACK] = new TextFieldMoveMaker();
-		
+		moveMaker[Chess.WHITE] = new AIMoveMaker(new KillerAI(12, logArea));
+		moveMaker[Chess.BLACK] = new TextFieldMoveMaker();
+
+		// moveMaker[Chess.WHITE] = new AIMoveMaker(new TransAI(20));
+		// moveMaker[Chess.BLACK] = new TextFieldMoveMaker();
+
 		VBox vb = new VBox();
 		vb.getChildren().addAll(boardView, logArea, commandField);
 		vb.setSpacing(10);
@@ -89,14 +88,15 @@ public class ChessClient extends Application {
 		// add everything to a root stackpane, and then to the main window
 		StackPane root = new StackPane();
 		root.getChildren().add(vb);
-		primaryStage.setScene(new Scene(root)); //, boardView.getPreferredWidth(), 600));
+		primaryStage.setScene(new Scene(root)); // ,
+												// boardView.getPreferredWidth(),
+												// 600));
 		primaryStage.show();
 
 		// sets the game world's game loop (Timeline)
 		Timeline timeline = new Timeline(1.0);
 		timeline.setCycleCount(Timeline.INDEFINITE);
-		timeline.getKeyFrames().add(
-				new KeyFrame(Duration.seconds(.05), new GameHandler()));
+		timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(.05), new GameHandler(timeline)));
 		timeline.playFromStart();
 		timeline.playFromStart();
 
@@ -105,12 +105,19 @@ public class ChessClient extends Application {
 	}
 
 	private void log(String logText) {
-		logArea.appendText(logText + "\n");
-		
+		Platform.runLater(() -> logArea.appendText(logText + "\n"));
 	}
-	
+
 	// As time passes, handle the state of the game
 	private class GameHandler implements EventHandler<ActionEvent> {
+		
+		private Timeline t;
+		
+		public GameHandler(Timeline t){
+			super();
+			this.t = t;
+		}
+		
 		@Override
 		public void handle(ActionEvent e) {
 			// System.out.println("timer fired");
@@ -120,13 +127,29 @@ public class ChessClient extends Application {
 			// created:
 
 			MoveMaker mover = moveMaker[game.position.getToPlay()];
+			
+			if (game.position.isTerminal()) {
+				log("Game Over\n");
+				if (game.position.isStaleMate()){
+					log("Stalemate");
+				}
+				else if (game.position.isMate()){
+					int loser = game.position.getToPlay();
+					String color = loser == 1 ? "Black" : "White"; 
+					log("Checkmate on " + color);
+				}
+				else{
+					log("Terminal state for unknown reasons.");
+				}
+				t.stop();
+			}
 
 			if (mover.getState() == Worker.State.READY) {
 				mover.start(game.position);
-			} else if (mover.getState() == Worker.State.SUCCEEDED
-					&& boardView.ready()) {
+			} else if (mover.getState() == Worker.State.SUCCEEDED && boardView.ready()) {
 				short move = mover.getMove();
 				boardView.doMove(move);
+				System.gc();
 				mover.reset();
 			}
 
@@ -141,8 +164,7 @@ public class ChessClient extends Application {
 
 	}
 
-	private class TextFieldMoveMaker implements MoveMaker,
-			EventHandler<ActionEvent> {
+	private class TextFieldMoveMaker implements MoveMaker, EventHandler<ActionEvent> {
 
 		private Worker.State state;
 		short move;
@@ -155,8 +177,9 @@ public class ChessClient extends Application {
 
 		@Override
 		public void start(Position position) {
-			//String[] players = {"WHITE", "BLACK"};
-			//commandField.setPromptText("Your move," + players[position.getToPlay()] + ".");
+			// String[] players = {"WHITE", "BLACK"};
+			// commandField.setPromptText("Your move," +
+			// players[position.getToPlay()] + ".");
 		}
 
 		@Override
@@ -179,8 +202,9 @@ public class ChessClient extends Application {
 		@Override
 		public void handle(ActionEvent e) {
 			String text = commandField.getText();
-			if (text != null & text != "") {
+			if (text != null & text != "" & text.length() > 0) {
 				System.out.println("Human move: " + text);
+				log("Human move: " + text + "\n");
 				int fromSqi = Chess.strToSqi(text.charAt(0), text.charAt(1));
 				int toSqi = Chess.strToSqi(text.charAt(2), text.charAt(3));
 
@@ -204,11 +228,11 @@ public class ChessClient extends Application {
 		}
 
 		public void start(Position position) {
-			
+
 			moveTask = new AIMoveTask(ai, new Position(position));
-			moveTask.setOnFailed(new EventHandler<WorkerStateEvent>() {    
+			moveTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
 				@Override
-				public void handle(WorkerStateEvent event) {     
+				public void handle(WorkerStateEvent event) {
 					event.getSource().getException().printStackTrace();
 				}
 			});
@@ -217,7 +241,7 @@ public class ChessClient extends Application {
 
 		public Worker.State getState() {
 			// short circuit if moveTask hasn't been initalized
-			//  (threading bug fix by Yu-Han Lyu)
+			// (threading bug fix by Yu-Han Lyu)
 			if (moveTask == null)
 				return Worker.State.READY;
 			if (moveTask.getState() == Worker.State.READY)
@@ -234,8 +258,6 @@ public class ChessClient extends Application {
 			this.moveTask = null;
 		}
 
-	
 	}
 
-	
 }

@@ -3,8 +3,12 @@ package chai;
 import java.util.HashMap;
 import java.util.Random;
 
+import javafx.application.Platform;
+import javafx.scene.control.TextArea;
+
 import chesspresso.Chess;
 import chesspresso.move.IllegalMoveException;
+import chesspresso.move.Move;
 import chesspresso.position.Position;
 
 public class KillerAI implements ChessAI {
@@ -13,16 +17,28 @@ public class KillerAI implements ChessAI {
 	private HashMap<Long, Entry> transposition;
 	private boolean foundMate;
 	private KillerTuple[] killerMoves;
+	private TextArea logView;
 	
-	public KillerAI(int depth){
+	public KillerAI(int depth, TextArea logView){
 		this.maxDepth = depth;
 		this.transposition = new HashMap<Long, Entry>();
+		this.logView = logView;
 		
 		// make a list of KillerTuples with an index for each depth
 		killerMoves = new KillerTuple[maxDepth];
 		for(int i = 0; i < maxDepth; i++){
 			killerMoves[i] = new KillerTuple();
 		}
+	}
+	
+	private void log(String text){
+		Platform.runLater(() -> logView.appendText(text + "\n"));
+	}
+	
+	public String getMoveString(int move){
+		char col = (char) ((move % 8) + 97);
+		int row = (move / 8) + 1;
+		return col + Integer.toString(row);
 	}
 	
 	public short getMove(Position position) {
@@ -41,6 +57,7 @@ public class KillerAI implements ChessAI {
 		Tuple result;
 		foundMate = false;
 		transposition.clear();
+		log("ChessBot computing best move...");
 		
 		for(int i = 1; i <= maxDepth; i++){
 			
@@ -61,6 +78,8 @@ public class KillerAI implements ChessAI {
 				break;
 			}
 		}
+		
+		log("ChessBot Move: " + getMoveString(Move.getFromSqi(bestMove)) + getMoveString(Move.getToSqi(bestMove)) + "\n");
 		return bestMove;
 	}
 	
@@ -184,6 +203,7 @@ public class KillerAI implements ChessAI {
 			}
 			catch(IllegalMoveException e){
 				System.out.print("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
+				log("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
 				return null;
 			}
 		}
@@ -287,6 +307,7 @@ public class KillerAI implements ChessAI {
 		
 		catch(IllegalMoveException e){
 			System.out.print("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
+			log("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
 			return -Integer.MAX_VALUE;
 		}
 	}
@@ -384,6 +405,7 @@ public class KillerAI implements ChessAI {
 		
 		catch(IllegalMoveException e){
 			System.out.println("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
+			log("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
 			return Integer.MAX_VALUE;
 		}
 	}

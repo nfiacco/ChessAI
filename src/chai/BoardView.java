@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.scene.control.TextArea;
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
@@ -29,6 +30,7 @@ public class BoardView extends Group {
 	
 	private int pixelsPerSquare;
 	private ChessGame game;
+	private TextArea logView;
 
 	private int numCurrentAnimations;
 
@@ -54,12 +56,13 @@ public class BoardView extends Group {
 		unicodePiece = Collections.unmodifiableMap(aMap);
 	}
 
-	public BoardView(ChessGame game, int pixelsPerSquare) {
+	public BoardView(TextArea logView, ChessGame game, int pixelsPerSquare) {
 
 		pieceLabels = new Label[64];
 
 		this.game = game;
 		this.pixelsPerSquare = pixelsPerSquare;
+		this.logView = logView;
 
 		Color colors[] = { Color.LIGHTGRAY, Color.WHITE };
 		int color_index = 0; // alternating index to select tile color
@@ -128,6 +131,10 @@ public class BoardView extends Group {
 		numCurrentAnimations = 0 ;
 
 	}
+	
+	private void log(String text){
+		logView.appendText(text + "\n");
+	}
 
 	public boolean doMove(short move) {
 		
@@ -141,6 +148,7 @@ public class BoardView extends Group {
 		// bail out if the move isn't legal
 		if (move == 0) {
 			System.out.println("Illegal move attempted.");
+			log("Illegal move attempted.");
 			return false;
 		}
 	
