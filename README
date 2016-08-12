@@ -1,5 +1,6 @@
 Chess AI
 Nicholas Fiacco
+March 2016
 
 This is a collection of various chess engines, each an improvement upon the
 last.  Within the src directory, you will find several chess engines, named:
