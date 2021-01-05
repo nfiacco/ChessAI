@@ -1,4 +1,4 @@
-package chai;
+package com.chessbot.app;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

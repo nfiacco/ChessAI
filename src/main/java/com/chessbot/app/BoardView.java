@@ -1,4 +1,4 @@
-package chai;
+package com.chessbot.app;
 
 import java.util.Collections;
 import java.util.HashMap;

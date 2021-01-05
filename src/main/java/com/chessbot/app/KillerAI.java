@@ -1,21 +1,44 @@
-package chai;
+package com.chessbot.app;
 
 import java.util.HashMap;
 import java.util.Random;
 
+import javafx.application.Platform;
+import javafx.scene.control.TextArea;
+
 import chesspresso.Chess;
 import chesspresso.move.IllegalMoveException;
+import chesspresso.move.Move;
 import chesspresso.position.Position;
 
-public class MTDFAI implements ChessAI {
+public class KillerAI implements ChessAI {
 	
 	private int ai_color, maxDepth, nodesExplored, transpositionUsed;
 	private HashMap<Long, Entry> transposition;
 	private boolean foundMate;
+	private KillerTuple[] killerMoves;
+	private TextArea logView;
 	
-	public MTDFAI(int depth){
+	public KillerAI(int depth, TextArea logView){
 		this.maxDepth = depth;
 		this.transposition = new HashMap<Long, Entry>();
+		this.logView = logView;
+		
+		// make a list of KillerTuples with an index for each depth
+		killerMoves = new KillerTuple[maxDepth];
+		for(int i = 0; i < maxDepth; i++){
+			killerMoves[i] = new KillerTuple();
+		}
+	}
+	
+	private void log(String text){
+		Platform.runLater(() -> logView.appendText(text + "\n"));
+	}
+	
+	public String getMoveString(int move){
+		char col = (char) ((move % 8) + 97);
+		int row = (move / 8) + 1;
+		return col + Integer.toString(row);
 	}
 	
 	public short getMove(Position position) {
@@ -34,6 +57,7 @@ public class MTDFAI implements ChessAI {
 		Tuple result;
 		foundMate = false;
 		transposition.clear();
+		log("ChessBot computing best move...");
 		
 		for(int i = 1; i <= maxDepth; i++){
 			
@@ -54,6 +78,8 @@ public class MTDFAI implements ChessAI {
 				break;
 			}
 		}
+		
+		log("ChessBot Move: " + getMoveString(Move.getFromSqi(bestMove)) + getMoveString(Move.getToSqi(bestMove)) + "\n");
 		return bestMove;
 	}
 	
@@ -145,6 +171,9 @@ public class MTDFAI implements ChessAI {
 	private Tuple TransAlphaBeta(Position position, int alpha, int beta, int MaxDepth){
 		
 		int value, max = -Integer.MAX_VALUE;
+		for(int i = 0; i < maxDepth; i++){
+			killerMoves[i].clear();
+		}
 		
 		// if it is checkmate, you lose!
 		if(position.isMate()){
@@ -174,6 +203,7 @@ public class MTDFAI implements ChessAI {
 			}
 			catch(IllegalMoveException e){
 				System.out.print("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
+				log("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
 				return null;
 			}
 		}
@@ -218,9 +248,34 @@ public class MTDFAI implements ChessAI {
 		}
 		
 		try{
-
+			
+			short[] moves = position.getAllMoves();
+			short killer1 = killerMoves[depth].getFirst();
+			short killer2 = killerMoves[depth].getSecond();
+			
+			// make sure they aren't both negative
+			if(killer1 >0 && killer2 > 0){
+				int index = 0;
+				for(int i = 0; i < moves.length; i++){
+					// move the killer move to the front
+					if(moves[i] == killer1){
+						short temp = moves[index];
+						moves[index] = moves[i];
+						moves[i] = temp;
+						index++;
+					}
+					// move the other killer to the front
+					if(moves[i] == killer2){
+						short temp = moves[index];
+						moves[index] = moves[i];
+						moves[i] = temp;
+						index++;
+					}
+				}
+			}
+			
 			// try to get the min of the possible moves by recursing with getMaxValue
-			for(short move : position.getAllMoves()){
+			for(short move : moves){
 				// the user makes a move
 				position.doMove(move);
 				min = Math.min(min, getMaxValue(position, alpha, beta, depth-1));
@@ -240,6 +295,9 @@ public class MTDFAI implements ChessAI {
 				if(min <= alpha){
 					// add as an upper bound
 					transposition.put(position.getHashCode(), new Entry(depth, min, Entry.UPPER));
+					
+					// add the killer move
+					killerMoves[depth].addMove(move);
 					return min;
 				}
 			}
@@ -249,6 +307,7 @@ public class MTDFAI implements ChessAI {
 		
 		catch(IllegalMoveException e){
 			System.out.print("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
+			log("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
 			return -Integer.MAX_VALUE;
 		}
 	}
@@ -268,10 +327,9 @@ public class MTDFAI implements ChessAI {
 			return 0;
 		}
 		
+		// only bounds matter, exact values aren't accurate with MTD(f)
 		// try to get existing value from transposition table
 		if(transposition.containsKey(position.getHashCode())){
-			
-			// only bounds matter, exact values aren't accurate with MTD(f)
 			// we only want high quality values, depends on how much depth is left
 			Entry entry = transposition.get(position.getHashCode());
 			if(entry.getQuality() >= depth){
@@ -290,8 +348,33 @@ public class MTDFAI implements ChessAI {
 		
 		try{
 			
+			short[] moves = position.getAllMoves();
+			short killer1 = killerMoves[depth].getFirst();
+			short killer2 = killerMoves[depth].getSecond();
+			
+			// make sure they aren't both negative
+			if(killer1 >0 && killer2 > 0){
+				int index = 0;
+				for(int i = 0; i < moves.length; i++){
+					// move the killer move to the front
+					if(moves[i] == killer1){
+						short temp = moves[index];
+						moves[index] = moves[i];
+						moves[i] = temp;
+						index++;
+					}
+					// move the other killer to the front
+					if(moves[i] == killer2){
+						short temp = moves[index];
+						moves[index] = moves[i];
+						moves[i] = temp;
+						index++;
+					}
+				}
+			}
+			
 			// try to get the max of the possible moves by recursing with getMinValue
-			for(short move : position.getAllMoves()){
+			for(short move : moves){
 				position.doMove(move);
 				max = Math.max(max, getMinValue(position, alpha, beta, depth-1));
 				position.undoMove();
@@ -310,6 +393,9 @@ public class MTDFAI implements ChessAI {
 				if(max >= beta){
 					// add as a lower bound
 					transposition.put(position.getHashCode(), new Entry(depth, max, Entry.LOWER));
+					
+					// add the killer move
+					killerMoves[depth].addMove(move);
 					return max;
 				}
 			}
@@ -319,6 +405,7 @@ public class MTDFAI implements ChessAI {
 		
 		catch(IllegalMoveException e){
 			System.out.println("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
+			log("You get washed. https://www.youtube.com/watch?v=4UDnTJcjPhY");
 			return Integer.MAX_VALUE;
 		}
 	}
@@ -356,6 +443,42 @@ public class MTDFAI implements ChessAI {
 		private short getMove(){ return move; }		
 		private int getValue(){ return value; }
 
+	}
+	
+	// store the killer moves for a particular depth, and note which was
+	// the last to be updated
+	private class KillerTuple{
+		private boolean last;
+		private short first, second;
+		
+		private KillerTuple(){
+			first = 1;
+			second = -1;
+			last = true;
+		}
+		
+		private short getFirst(){return first;}
+		private short getSecond(){return second;}
+		
+		private void addMove(short move){
+			// don't add duplicates
+			if(move != first && move != second){
+				if(last){
+					first = move;
+				}
+				else{
+					second = move;
+				}
+				// flip the value so next time the other is updated
+				last = !last;
+			}
+		}
+		
+		private void clear(){
+			first = -1;
+			second = -1;
+			last = true;
+		}
 	}
 	
 }

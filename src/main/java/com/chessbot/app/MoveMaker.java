@@ -1,7 +1,7 @@
 // a MoveMaker wraps the process that decides on a move given a position,
 // whether the move is gotten from the UI, the server, or a local AI
 
-package chai;
+package com.chessbot.app;
 
 import javafx.concurrent.Worker;
 import chesspresso.position.Position;

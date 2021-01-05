@@ -1,4 +1,4 @@
-package chai;
+package com.chessbot.app;
 
 import javafx.concurrent.Task;
 import chesspresso.position.Position;
