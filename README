@@ -14,7 +14,7 @@ KillerAI
 
 This lists them in order of performance, from worst to best.  Furthermore, note
 that you can test them by setting the initial position in chessgame.java and
-choosing the AI in chessclient.java, where one player should be the human
+choosing the AI in ChessClient.java, where one player should be the human
 for maximum control (in positions where there is a guarenteed win for the
 computer, resistance is futile).
 
@@ -22,9 +22,11 @@ In order to access the writeup, please refer to the doc directory.
 
 Execution Instructions:
 1) clone the repository
-2) navigate to the /exec directory
-3) run the command: "java -jar <jar file name here>"
-4) chess view should open, with keyboard input
+2) run the command: `java -jar shade/chessbot.jar`
+3) chess view should open, with keyboard input
+
+Build instructions:
+Run `mvn compile package`
 
 Note: performance is most notable in endgame situations, rather than the normal setup
 Also note: all executable JARS utilize the fully optimized version of the engine.
