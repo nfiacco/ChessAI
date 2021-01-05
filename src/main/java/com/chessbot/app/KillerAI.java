@@ -208,8 +208,8 @@ public class KillerAI implements ChessAI {
 			}
 		}
 		
-		System.out.println("Alpha-Beta Nodes Explored at depth " + MaxDepth + ": " + nodesExplored 
-				+ "\nAlpha-Beta Value: " + max + "\nUsed Transposition Table: " + transpositionUsed + "\n");
+		// System.out.println("Alpha-Beta Nodes Explored at depth " + MaxDepth + ": " + nodesExplored 
+		//		+ "\nAlpha-Beta Value: " + max + "\nUsed Transposition Table: " + transpositionUsed + "\n");
 		return new Tuple(bestMove, max);
 	}
 	

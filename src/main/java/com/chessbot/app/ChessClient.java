@@ -74,7 +74,7 @@ public class ChessClient extends Application {
 		// from a server, depending on which type is used.
 		moveMaker = new MoveMaker[2];
 
-		moveMaker[Chess.BLACK] = new AIMoveMaker(new KillerAI(8, logArea));
+		moveMaker[Chess.BLACK] = new AIMoveMaker(new KillerAI(7, logArea));
 		moveMaker[Chess.WHITE] = new TextFieldMoveMaker();
 
 		// moveMaker[Chess.WHITE] = new AIMoveMaker(new TransAI(20));
@@ -203,7 +203,7 @@ public class ChessClient extends Application {
 		public void handle(ActionEvent e) {
 			String text = commandField.getText();
 			if (text != null & text != "" & text.length() > 0) {
-				System.out.println("Human move: " + text);
+				//System.out.println("Human move: " + text);
 				log("Human move: " + text + "\n");
 				int fromSqi = Chess.strToSqi(text.charAt(0), text.charAt(1));
 				int toSqi = Chess.strToSqi(text.charAt(2), text.charAt(3));
