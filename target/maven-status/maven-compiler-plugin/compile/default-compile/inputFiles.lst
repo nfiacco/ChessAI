@@ -1,0 +1,13 @@
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/ChessAI.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/MoveMaker.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/ChessGame.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/AlphaBetaAI.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/TransAI.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/RandomAI.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/BoardView.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/ChessLauncher.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/AIMoveTask.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/MTDFAI.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/ChessClient.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/KillerAI.java
+/Users/nickfiacco/ChessBot/src/main/java/com/chessbot/app/MinimaxAI.java
